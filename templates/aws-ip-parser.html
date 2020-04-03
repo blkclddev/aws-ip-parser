@@ -76,7 +76,7 @@
                         </div>
                         <select  class="form-control" size="15" name="prefix_filter">
                             <option value="" disabled>Choose prefix(es)</option>
-                            <option value="both"{% if selected_prefixes is not defined %}selected{% elif "all" in selected_prefixes %}selected{% endif %}>Both</option>
+                            <option value="both"{% if selected_prefixes is not defined %}selected{% elif "both" in selected_prefixes %}selected{% endif %}>Both</option>
                             <option value="ipv4"{% if selected_prefixes is defined %}{% if "ipv4" in selected_prefixes %}selected{% endif %}{% endif %}>IPv4</option>
                             <option value="ipv6"{% if selected_prefixes is defined %}{% if "ipv6" in selected_prefixes %}selected{% endif %}{% endif %}>IPv6</option>
                         </select>
