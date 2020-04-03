@@ -6,32 +6,38 @@ app = Flask(__name__)
 
 @app.route('/',methods = ['POST', 'GET'])
 def awsIPParser():
+    # URL to be targeted
+    url = "https://ip-ranges.amazonaws.com/ip-ranges.json"
+
+    # Fetch the response from the URL
+    response = urllib.request.urlopen(url)
+
+    # Load the response as JSON
+    data = json.loads(response.read())
+
+    # Build the list of regions
+    regions = fetchRegions(data)
+
+    # Build the list of services
+    services = fetchServices(data)
+
     if request.method == 'GET':
         # Render the main page
-        return render_template('aws-ip-parser.html')
+        return render_template('aws-ip-parser.html', regions=regions, services=services)
     elif request.method == 'POST':
         # Arguments to send to method
-        selected_prefixes = str(request.form.get('prefix_filter'))
-        selected_regions = str(request.form.get('region_filter'))
-        selected_services = str(request.form.get('service_filter'))
+        selected_prefixes = str(request.form.getlist('prefix_filter'))
+        selected_regions = str(request.form.getlist('region_filter'))
+        selected_services = str(request.form.getlist('service_filter'))
 
-        # URL to be targeted
-        url = "https://ip-ranges.amazonaws.com/ip-ranges.json"
-
-        # Fetch the response from the URL
-        response = urllib.request.urlopen(url)
-
-        # Load the response as JSON
-        data = json.loads(response.read())
-
-        # Build the results
+        # Build the list of IPs
         result = retrieveIPInfo(selected_prefixes, selected_regions, selected_services, data)
 
         # Count prefixes in list
         count = len(result)
 
         # Render the page with the results
-        return render_template('aws-ip-parser.html',result=result, count=count)
+        return render_template('aws-ip-parser.html', selected_prefixes=selected_prefixes, selected_regions=selected_regions, selected_services=selected_services, regions=regions, services=services, result=result, count=count)
 
 def retrieveIPInfo (prefixes, regions, services, json_data):
     # Dictionary to store initial data
@@ -41,47 +47,47 @@ def retrieveIPInfo (prefixes, regions, services, json_data):
     key = 0
 
     # Add IPv4 prefixes to list
-    if prefixes == "ipv4" or prefixes == "both":
+    if "ipv4" in prefixes or "both" in prefixes:
         for i in json_data["prefixes"]:
             # If all regions and services are selected
-            if regions == "all" and services == "all":
+            if "all" in regions and "all" in services:
                 ip_list[key] = {"ip_prefix" : i["ip_prefix"], "region" : i["region"], "service" : i["service"]}
                 key += 1
             # If all regions and some services are selected
-            if regions == "all" and services != "all":
+            if "all" in regions and "all" not in services:
                 if i["service"] in services:
                     ip_list[key] = {"ip_prefix" : i["ip_prefix"], "region" : i["region"], "service" : i["service"]}
                     key += 1
             # If some regions and some services are selected
-            if regions != "all" and services != "all":
+            if "all" not in regions and "all" not in services:
                 if i["region"] in regions and i["service"] in services:
                     ip_list[key] = {"ip_prefix" : i["ip_prefix"], "region" : i["region"], "service" : i["service"]}
                     key += 1
             # If some regions and all services are selected
-            if regions != "all" and services == "all":
+            if "all" not in regions and "all" in services:
                 if i["region"] in regions:
                     ip_list[key] = {"ip_prefix" : i["ip_prefix"], "region" : i["region"], "service" : i["service"]}
                     key += 1
     
     # Add IPv6 prefixes to list
-    if prefixes == "ipv6" or prefixes == "both":
+    if "ipv6" in prefixes or "both" in prefixes:
         for i in json_data["ipv6_prefixes"]:
             # If all regions and services are selected
-            if regions == "all" and services == "all":
+            if "all" in regions and "all" in services:
                 ip_list[key] = {"ip_prefix" : i["ipv6_prefix"], "region" : i["region"], "service" : i["service"]}
                 key += 1
             # If all regions and some services are selected
-            if regions == "all" and services != "all":
+            if "all" in regions and "all" not in services:
                 if i["service"] in services:
                     ip_list[key] = {"ip_prefix" : i["ipv6_prefix"], "region" : i["region"], "service" : i["service"]}
                     key += 1
             # If some regions and some services are selected
-            if regions != "all" and services != "all":
+            if "all" not in regions and "all" not in services:
                 if i["region"] in regions and i["service"] in services:
                     ip_list[key] = {"ip_prefix" : i["ipv6_prefix"], "region" : i["region"], "service" : i["service"]}
                     key += 1
             # If some regions and all services are selected
-            if regions != "all" and services == "all":
+            if "all" not in regions and "all" in services:
                 if i["region"] in regions:
                     ip_list[key] = {"ip_prefix" : i["ipv6_prefix"], "region" : i["region"], "service" : i["service"]}
                     key += 1
@@ -112,7 +118,7 @@ def fetchRegions(json_data):
         if r not in deduped_region_list:
             deduped_region_list.append(r)
 
-    return deduped_region_list
+    return sorted(deduped_region_list)
 
 def fetchServices(json_data):
     # Build service list
@@ -131,7 +137,7 @@ def fetchServices(json_data):
         if s not in deduped_service_list:
             deduped_service_list.append(s)
 
-    return deduped_service_list
+    return sorted(deduped_service_list)
 
 # If application is being called directly
 if __name__ == '__main__':

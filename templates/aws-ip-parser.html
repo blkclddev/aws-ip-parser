@@ -76,9 +76,9 @@
                         </div>
                         <select  class="form-control" size="15" name="prefix_filter">
                             <option value="" disabled>Choose prefix(es)</option>
-                            <option value="both" selected>Both</option>
-                            <option value="ipv4">IPv4</option>
-                            <option value="ipv6">IPv6</option>
+                            <option value="both"{% if selected_prefixes is not defined %}selected{% elif "all" in selected_prefixes %}selected{% endif %}>Both</option>
+                            <option value="ipv4"{% if selected_prefixes is defined %}{% if "ipv4" in selected_prefixes %}selected{% endif %}{% endif %}>IPv4</option>
+                            <option value="ipv6"{% if selected_prefixes is defined %}{% if "ipv6" in selected_prefixes %}selected{% endif %}{% endif %}>IPv6</option>
                         </select>
                     </div>
                 </div>
@@ -89,32 +89,10 @@
                         </div>
                         <select multiple class="form-control" size="15" name="region_filter">
                             <option value="" disabled>Choose region(s)</option>
-                            <option value="all" selected>All</option>
-                            <option value="af-south-1">af-south-1</option>
-                            <option value="ap-east-1">ap-east-1</option>
-                            <option value="ap-northeast-1">ap-northeast-1</option>
-                            <option value="ap-northeast-2">ap-northeast-2</option>
-                            <option value="ap-northeast-3">ap-northeast-3</option>
-                            <option value="ap-south-1">ap-south-1</option>
-                            <option value="ap-southeast-1">ap-southeast-1</option>
-                            <option value="ap-southeast-2">ap-southeast-2</option>
-                            <option value="ca-central-1">ca-central-1</option>
-                            <option value="cn-north-1">cn-north-1</option>
-                            <option value="cn-northwest-1">cn-northwest-1</option>
-                            <option value="eu-central-1">eu-central-1</option>
-                            <option value="eu-north-1">eu-north-1</option>
-                            <option value="eu-west-1">eu-west-1</option>
-                            <option value="eu-west-2">eu-west-2</option>
-                            <option value="eu-west-3">eu-west-3</option>
-                            <option value="GLOBAL">GLOBAL</option>
-                            <option value="me-south-1">me-south-1</option>
-                            <option value="sa-east-1">sa-east-1</option>
-                            <option value="us-east-1">us-east-1</option>
-                            <option value="us-east-2">us-east-2</option>
-                            <option value="us-gov-east-1">us-gov-east-1</option>
-                            <option value="us-gov-west-1">us-gov-west-1</option>
-                            <option value="us-west-1">us-west-1</option>
-                            <option value="us-west-2">us-west-2</option>                        
+                            <option value="all"{% if selected_regions is not defined %}selected{% elif "all" in selected_regions %}selected{% endif %}>All</option>
+                            {% for item in regions %}
+                            <option value="{{ item }}"{% if selected_regions is defined %}{% if item in selected_regions %}selected{% endif %}{% endif %}>{{ item }}</option>
+                            {% endfor %}                       
                         </select>
                     </div>
                 </div>
@@ -125,22 +103,10 @@
                         </div>
                         <select multiple class="form-control" size="15" name="service_filter">
                             <option value="" disabled>Choose Service(s)</option>
-                            <option value="all" selected>All</option>
-                            <option value="AMAZON">AMAZON</option>
-                            <option value="AMAZON_CONNECT">AMAZON_CONNECT</option>
-                            <option value="API_GATEWAY">API_GATEWAY</option>
-                            <option value="CLOUD9">CLOUD9</option>
-                            <option value="CLOUDFRONT">CLOUDFRONT</option>
-                            <option value="CODEBUILD">CODEBUILD</option>
-                            <option value="DYNAMODB">DYNAMODB</option>
-                            <option value="EC2">EC2</option>
-                            <option value="EC2_INSTANCE_CONNECT">EC2_INSTANCE_CONNECT</option>
-                            <option value="GLOBALACCELERATOR">GLOBALACCELERATOR</option>
-                            <option value="ROUTE53">ROUTE53</option>
-                            <option value="ROUTE53_HEALTHCHECKS">ROUTE53_HEALTHCHECKS</option>
-                            <option value="ROUTE53_HEALTHCHECKS_PUBLISHING">ROUTE53_HEALTHCHECKS_PUBLISHING</option>
-                            <option value="S3">S3</option>
-                            <option value="WORKSPACES_GATEWAYS">WORKSPACES_GATEWAYS</option>                        
+                            <option value="all"{% if selected_services is not defined %}selected{% elif "all" in selected_services %}selected{% endif %}>All</option>
+                            {% for item in services %}
+                            <option value="{{ item }}"{% if selected_services is defined %}{% if item in selected_services %}selected{% endif %}{% endif %}>{{ item }}</option>
+                            {% endfor %}                        
                         </select>
                     </div>
                 </div>
